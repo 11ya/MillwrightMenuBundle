@@ -15,7 +15,8 @@
     <services>
         <service id="millwright_menu.factory" class="%millwright_menu.factory.class%">
             <argument type="service" id="router" />
-            <argument type="service" id="security.context" />
+            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="security.authorization_checker" />
             <argument type="service" id="security.acl.provider" on-invalid="null" />
         </service>
 

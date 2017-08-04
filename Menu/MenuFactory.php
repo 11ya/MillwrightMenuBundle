@@ -16,6 +16,8 @@ use Knp\Menu\ItemInterface as MenuItemInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
@@ -51,7 +53,12 @@ class MenuFactory implements MenuFactoryInterface
     protected $router;
 
     /**
-     * @var SecurityContextInterface
+     * @var TokenStorageInterface
+     */
+    protected $tokenStorage;
+
+    /**
+     * @var AuthorizationCheckerInterface
      */
     protected $security;
 
@@ -64,12 +71,14 @@ class MenuFactory implements MenuFactoryInterface
 
     public function __construct(
         RouterInterface $router,
-        SecurityContextInterface $security,
+        TokenStorageInterface $tokenStorage,
+        AuthorizationCheckerInterface $security,
         AclProviderInterface $aclProvider = null
     )
     {
         $this->router      = $router;
         $this->security    = $security;
+        $this->tokenStorage    = $tokenStorage;
         $this->aclProvider = $aclProvider;
     }
 
@@ -122,7 +131,7 @@ class MenuFactory implements MenuFactoryInterface
     {
         $display  = true;
         $rootItem = !$item->getName();
-        $token    = $this->security->getToken();
+        $token    = $this->tokenStorage->getToken();
 
         if ($token) {
             if ($options['roles'] && !$this->security->isGranted($options['roles'])) {
@@ -301,7 +310,7 @@ class MenuFactory implements MenuFactoryInterface
         if ($preloadOids && $this->aclProvider) {
             //preload all acls for menu items
             try {
-                $this->aclProvider->findAcls($preloadOids);
+                $this->aclProvider->findAcl($preloadOids);
             } catch(AclNotFoundException $e) {
             }
         }
