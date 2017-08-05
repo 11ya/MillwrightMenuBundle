@@ -19,6 +19,7 @@ use Millwright\ConfigurationBundle\Configuration\RouteInfo;
 
 use Millwright\MenuBundle\Annotation\Menu;
 use Millwright\MenuBundle\Annotation\MenuDefault;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 /**
  * @author      Stefan Zerkalica <zerkalica@gmail.com>
@@ -76,7 +77,13 @@ class OptionBuilder extends OptionBuilderBase
         $options = array();
         foreach ($annotations as $params) {
             foreach ($params as $param) {
-                if ($param instanceof SecureParam) {
+                if ($param instanceof Security) {
+                    $expression = $param->getExpression();
+                    $result = [];
+                    if (preg_match_all('/has_role\([\'"]([^\']*)[\'"]\)/', $expression, $result)) {
+                        $options['roles'] = end($result);
+                    }
+                } elseif ($param instanceof SecureParam) {
                     /** @var $param SecureParam */
                     $options['secureParams'][$param->name] = $this->annotationToArray($param);
                     /* @var $argument \ReflectionParameter */
@@ -89,10 +96,8 @@ class OptionBuilder extends OptionBuilderBase
                     }
 
                     $options['secureParams'][$param->name]['class'] = $class->getName();
-                } else {
-                    if ($param instanceof Secure || $param instanceof Menu || $param instanceof MenuDefault) {
-                        $options += $this->annotationToArray($param);
-                    }
+                } elseif ($param instanceof Secure || $param instanceof Menu || $param instanceof MenuDefault) {
+                    $options += $this->annotationToArray($param);
                 }
             }
         }
