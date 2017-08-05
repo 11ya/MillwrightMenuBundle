@@ -113,7 +113,7 @@ class MenuBuilder implements MenuBuilderInterface
     protected function addVoter()
     {
         if (!$this->currentUri) {
-            $currentUri = $this->container->get('request')->getRequestUri();
+            $currentUri = $this->container->get('request_stack')->getCurrentRequest()->getRequestUri();
 
             // We remove URI params (after '?') for building correct breadcrumbs and menu
             $pos = strpos($currentUri, '?');
