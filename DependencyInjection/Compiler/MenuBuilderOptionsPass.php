@@ -17,6 +17,12 @@ class MenuBuilderOptionsPass implements CompilerPassInterface
     {
         $normalizer = function(array &$config, Processor $processor, ContainerBuilder $container)
         {
+            foreach ($config as $key => $item) {
+                if (isset($item[0]) && $item[0] === '%' && $container->hasParameter($parameter = trim($item, '%'))) {
+                    $config[$key] = $container->getParameter($parameter);
+                }
+            }
+
             //reuse configuration for validating service-provided menu configs
             $config = $processor->processConfiguration(new MenuConfiguration, array('millwright_menu' => $config));
 
