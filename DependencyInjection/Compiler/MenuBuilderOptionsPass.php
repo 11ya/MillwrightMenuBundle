@@ -15,39 +15,9 @@ class MenuBuilderOptionsPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        $normalizer = function(array &$config, Processor $processor, ContainerBuilder $container)
-        {
-            foreach ($config as $key => $item) {
-                if (isset($item[0]) && $item[0] === '%' && $container->hasParameter($parameter = trim($item, '%'))) {
-                    $config[$key] = $container->getParameter($parameter);
-                }
-            }
-
-            //reuse configuration for validating service-provided menu configs
-            $config = $processor->processConfiguration(new MenuConfiguration, array('millwright_menu' => $config));
-
-            if(isset($config['renderers'])) {
-                $renderers = $config['renderers'];
-                foreach($config['tree'] as & $tree) {
-                    if(isset($tree['type'])) {
-                        $type = $tree['type'];
-                        if(isset($renderers[$type])) {
-                            $renderOption = $renderers[$type];
-                            foreach(array('attributes') as $option) {
-                                if(isset($renderOption[$option])) {
-                                    $tree[$option] = $renderOption[$option];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        };
-
         $config = ContainerUtil::collectConfiguration(
             'millwright_menu.menu_options',
-            $container,
-            $normalizer
+            $container
         );
 
         $container->getDefinition('millwright_menu.helper')
