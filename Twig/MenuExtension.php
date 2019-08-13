@@ -22,9 +22,9 @@ class MenuExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'millwright_menu_get' => new \Twig_Function_Method($this, 'get'),
-            'millwright_menu_render' => new \Twig_Function_Method($this, 'render', array('is_safe' => array('html'))),
-            'millwright_link_render' => new \Twig_Function_Method($this, 'renderLink', array('is_safe' => array('html'))),
+            new \Twig_SimpleFunction('millwright_menu_get', array($this, 'get')),
+            new \Twig_SimpleFunction('millwright_menu_render', array($this, 'render'), array('is_safe' => array('html'))),
+            new \Twig_SimpleFunction('millwright_link_render', array($this, 'renderLink'), array('is_safe' => array('html'))),
         );
     }
 
