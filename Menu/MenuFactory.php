@@ -149,7 +149,7 @@ class MenuFactory implements MenuFactoryInterface
             }
         }
 
-        if ($options['route'] && !$rootItem) {
+        if ($options['route'] && !$rootItem && $display) {
             $acceptedRouteParameters = array_intersect_key($routeParameters, $options['routeAcceptedParameters']);
 
             if ($options['routeRequiredParameters'] === $options['routeAcceptedParameters']) {
@@ -174,9 +174,15 @@ class MenuFactory implements MenuFactoryInterface
             }
         }
 
-        if (!$display) {
-            $item->setDisplay(false);
+        $parent = $item->getParent();
+        if ($display && $parent) {
+            $parent->setDisplay(true);
+            if (!$rootItem && $item->hasChildren()) {
+                $display = false;
+            }
         }
+
+        $item->setDisplay($display);
 
         return $this;
     }
